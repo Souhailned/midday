@@ -43,7 +43,7 @@ export function PdfViewer({ url, maxWidth }: PdfViewerProps) {
 
   function onDocumentLoadError(error: Error): void {
     // Check if it's a password-related error
-    const errorMessage = error.message.toLowerCase();
+    const errorMessage = error.message?.toLowerCase() || '';
     if (
       errorMessage.includes("password") ||
       errorMessage.includes("encrypted")

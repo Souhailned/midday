@@ -13,21 +13,21 @@ export function categorizeOAuthError(error: unknown): {
     };
   }
 
-  const errorMessage = error.message.toLowerCase();
+  const errorMessage = error.message?.toLowerCase() || '';
 
   // Check for specific error patterns
   if (
     errorMessage.includes("invalid client_id") ||
     errorMessage.includes("client_id")
   ) {
-    return { errorType: "invalid_client_id", details: error.message };
+    return { errorType: "invalid_client_id", details: error.message || 'Unknown error' };
   }
 
   if (
     errorMessage.includes("invalid redirect_uri") ||
     errorMessage.includes("redirect_uri")
   ) {
-    return { errorType: "invalid_redirect_uri", details: error.message };
+    return { errorType: "invalid_redirect_uri", details: error.message || 'Unknown error' };
   }
 
   if (
@@ -36,8 +36,8 @@ export function categorizeOAuthError(error: unknown): {
   ) {
     return {
       errorType: "invalid_scopes",
-      customMessage: error.message,
-      details: error.message,
+      customMessage: error.message || 'Unknown error',
+      details: error.message || 'Unknown error',
     };
   }
 
@@ -45,31 +45,31 @@ export function categorizeOAuthError(error: unknown): {
     if (errorMessage.includes("authorization code")) {
       return {
         errorType: "authorization_code_expired",
-        details: error.message,
+        details: error.message || 'Unknown error',
       };
     }
     if (errorMessage.includes("refresh token")) {
-      return { errorType: "refresh_token_expired", details: error.message };
+      return { errorType: "refresh_token_expired", details: error.message || 'Unknown error' };
     }
-    return { errorType: "expired", details: error.message };
+    return { errorType: "expired", details: error.message || 'Unknown error' };
   }
 
   if (errorMessage.includes("already used") || errorMessage.includes("used")) {
-    return { errorType: "authorization_code_used", details: error.message };
+    return { errorType: "authorization_code_used", details: error.message || 'Unknown error' };
   }
 
   if (
     errorMessage.includes("not authenticated") ||
     errorMessage.includes("authentication")
   ) {
-    return { errorType: "user_not_authenticated", details: error.message };
+    return { errorType: "user_not_authenticated", details: error.message || 'Unknown error' };
   }
 
   if (
     errorMessage.includes("inactive") ||
     errorMessage.includes("not active")
   ) {
-    return { errorType: "application_inactive", details: error.message };
+    return { errorType: "application_inactive", details: error.message || 'Unknown error' };
   }
 
   if (
@@ -78,18 +78,18 @@ export function categorizeOAuthError(error: unknown): {
   ) {
     return {
       errorType: "invalid_client_credentials",
-      details: error.message,
+      details: error.message || 'Unknown error',
     };
   }
 
   if (errorMessage.includes("code verifier") || errorMessage.includes("pkce")) {
-    return { errorType: "invalid_code_verifier", details: error.message };
+    return { errorType: "invalid_code_verifier", details: error.message || 'Unknown error' };
   }
 
   if (errorMessage.includes("code challenge method")) {
     return {
       errorType: "invalid_code_challenge_method",
-      details: error.message,
+      details: error.message || 'Unknown error',
     };
   }
 
@@ -97,21 +97,21 @@ export function categorizeOAuthError(error: unknown): {
     errorMessage.includes("refresh token revoked") ||
     errorMessage.includes("revoked")
   ) {
-    return { errorType: "refresh_token_revoked", details: error.message };
+    return { errorType: "refresh_token_revoked", details: error.message || 'Unknown error' };
   }
 
   if (
     errorMessage.includes("invalid refresh token") ||
     errorMessage.includes("refresh token")
   ) {
-    return { errorType: "invalid_refresh_token", details: error.message };
+    return { errorType: "invalid_refresh_token", details: error.message || 'Unknown error' };
   }
 
   if (
     errorMessage.includes("grant type") ||
     errorMessage.includes("unsupported")
   ) {
-    return { errorType: "grant_type_not_supported", details: error.message };
+    return { errorType: "grant_type_not_supported", details: error.message || 'Unknown error' };
   }
 
   if (
@@ -120,7 +120,7 @@ export function categorizeOAuthError(error: unknown): {
   ) {
     return {
       errorType: "failed_to_create_authorization_code",
-      details: error.message,
+      details: error.message || 'Unknown error',
     };
   }
 
@@ -130,7 +130,7 @@ export function categorizeOAuthError(error: unknown): {
   ) {
     return {
       errorType: "invalid_authorization_code",
-      details: error.message,
+      details: error.message || 'Unknown error',
     };
   }
 
@@ -138,14 +138,14 @@ export function categorizeOAuthError(error: unknown): {
     errorMessage.includes("invalid url") ||
     errorMessage.includes("malformed url")
   ) {
-    return { errorType: "invalid_url_format", details: error.message };
+    return { errorType: "invalid_url_format", details: error.message || 'Unknown error' };
   }
 
   if (
     errorMessage.includes("empty scopes") ||
     errorMessage.includes("no scopes")
   ) {
-    return { errorType: "empty_scopes", details: error.message };
+    return { errorType: "empty_scopes", details: error.message || 'Unknown error' };
   }
 
   if (
@@ -153,14 +153,14 @@ export function categorizeOAuthError(error: unknown): {
     errorMessage.includes("permission") ||
     errorMessage.includes("team")
   ) {
-    return { errorType: "unauthorized_team_access", details: error.message };
+    return { errorType: "unauthorized_team_access", details: error.message || 'Unknown error' };
   }
 
   // Default to server error for unrecognized errors
   return {
     errorType: "server_error",
-    customMessage: error.message,
-    details: error.message,
+    customMessage: error.message || 'Unknown error',
+    details: error.message || 'Unknown error',
   };
 }
 
