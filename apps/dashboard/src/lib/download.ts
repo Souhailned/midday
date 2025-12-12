@@ -16,18 +16,23 @@ export async function downloadFile(url: string, filename: string) {
   try {
     // Desktop mode - open download URL in default browser
     // The browser will have access to user's authentication and handle the download
-    console.log("📥 Opening download in browser:", { url, filename });
+    console.log("Opening download in browser:", { url, filename });
 
-    const downloadUrl = `${window.location.origin}${url}`;
+    // Check if URL is already absolute (starts with http:// or https://)
+    // If relative, prepend window.location.origin
+    const downloadUrl =
+      url.startsWith("http://") || url.startsWith("https://")
+        ? url
+        : `${window.location.origin}${url}`;
 
     // Use Tauri's opener plugin via invoke to open URL in default browser
     await invoke("plugin:opener|open_url", {
       url: downloadUrl,
     });
 
-    console.log("✅ Download opened in browser:", downloadUrl);
+    console.log("Download opened in browser:", downloadUrl);
   } catch (error) {
-    console.error("❌ Failed to open download in browser:", error);
+    console.error("Failed to open download in browser:", error);
     throw error;
   }
 }

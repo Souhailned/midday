@@ -4,6 +4,7 @@ import { bankAccountsRouter } from "./bank-accounts";
 import { chatRouter } from "./chat";
 import { customersRouter } from "./customers";
 import { documentsRouter } from "./documents";
+import { filesRouter } from "./files";
 import { inboxRouter } from "./inbox";
 import { invoicesRouter } from "./invoices";
 import { notificationsRouter } from "./notifications";
@@ -17,11 +18,14 @@ import { trackerProjectsRouter } from "./tracker-projects";
 import { transactionsRouter } from "./transactions";
 import { transcriptionRouter } from "./transcription";
 import { usersRouter } from "./users";
+import { webhookRouter } from "./webhooks";
 
 const routers = new OpenAPIHono();
 
-// Mount OAuth routes first (publicly accessible)
+// Mount public routes first (no authentication required and no rate limiting)
 routers.route("/oauth", oauthRouter);
+routers.route("/webhook", webhookRouter);
+routers.route("/files", filesRouter);
 
 // Apply protected middleware to all subsequent routes
 routers.use(...protectedMiddleware);

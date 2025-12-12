@@ -23,10 +23,11 @@
       "@api/*": ["src/*"],
       "@engine/*": ["../engine/src/*"],
       "@jobs/*": ["../../packages/jobs/src/*"],
-      "@db/*": ["../../packages/db/src/*"]
+      "@db/*": ["../../packages/db/src/*"],
+      "@midday/job-client": ["../../packages/job-client/src/index.ts"]
     },
     "types": ["bun-types"]
   },
   "exclude": ["node_modules"],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "../../types"]
 }

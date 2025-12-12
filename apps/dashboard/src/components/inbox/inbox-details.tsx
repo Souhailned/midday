@@ -1,5 +1,6 @@
 import { FileViewer } from "@/components/file-viewer";
 import { FormatAmount } from "@/components/format-amount";
+import { useFileUrl } from "@/hooks/use-file-url";
 import { useInboxFilterParams } from "@/hooks/use-inbox-filter-params";
 import { useInboxParams } from "@/hooks/use-inbox-params";
 import { useUserQuery } from "@/hooks/use-user";
@@ -30,6 +31,7 @@ import {
 } from "@midday/ui/tooltip";
 import { useToast } from "@midday/ui/use-toast";
 import { formatDate, getInitials } from "@midday/utils/format";
+import { getTaxTypeLabel } from "@midday/utils/tax";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { MoreVertical, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -234,6 +236,22 @@ export function InboxDetails() {
     });
   };
 
+  const { url: downloadUrl } = useFileUrl(
+    data?.filePath && data?.fileName
+      ? {
+          type: "download",
+          filePath: data.filePath.join("/"),
+          filename: data.fileName,
+        }
+      : null,
+  );
+
+  const handleDownload = () => {
+    if (downloadUrl && data?.fileName) {
+      downloadFile(downloadUrl, data.fileName);
+    }
+  };
+
   const fallback = showFallback || (!data?.website && data?.displayName);
 
   if (isLoading) {
@@ -324,14 +342,8 @@ export function InboxDetails() {
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
-                  onClick={() => {
-                    if (data?.filePath && data?.fileName) {
-                      downloadFile(
-                        `/api/download/file?path=${data.filePath.join("/")}&filename=${data.fileName}`,
-                        data.fileName,
-                      );
-                    }
-                  }}
+                  onClick={handleDownload}
+                  disabled={!downloadUrl}
                 >
                   <Icons.ProjectStatus className="mr-2 size-4" />
                   <span className="text-xs">Download</span>
@@ -445,12 +457,46 @@ export function InboxDetails() {
                   {isProcessing && !data.currency && (
                     <Skeleton className="h-3 w-[50px]" />
                   )}
-                  {data.currency && data.amount != null && (
-                    <FormatAmount
-                      amount={data.amount}
-                      currency={data.currency}
-                    />
-                  )}
+                  {data.currency &&
+                    data.amount != null &&
+                    (!isProcessing &&
+                    data?.taxAmount &&
+                    data.taxAmount > 0 &&
+                    data.currency ? (
+                      <TooltipProvider delayDuration={100}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="cursor-help">
+                              <FormatAmount
+                                amount={data.amount}
+                                currency={data.currency}
+                              />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-xs px-2 py-1">
+                            <div className="flex flex-col gap-0.5">
+                              <span>
+                                {data.taxType &&
+                                  `${getTaxTypeLabel(data.taxType)} `}
+                                <FormatAmount
+                                  amount={data.taxAmount}
+                                  currency={data.currency}
+                                  maximumFractionDigits={2}
+                                />
+                                {data.taxRate &&
+                                  data.taxRate > 0 &&
+                                  ` (${data.taxRate}%)`}
+                              </span>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      <FormatAmount
+                        amount={data.amount}
+                        currency={data.currency}
+                      />
+                    ))}
                 </div>
               </div>
             </div>
@@ -475,7 +521,7 @@ export function InboxDetails() {
               <div className="min-h-0 flex-shrink-0">
                 <FileViewer
                   mimeType={data.contentType}
-                  url={`/api/proxy?filePath=vault/${data?.filePath.join("/")}`}
+                  url={`${process.env.NEXT_PUBLIC_API_URL}/files/proxy?filePath=vault/${data?.filePath.join("/")}`}
                   // If the order changes, the file viewer will remount otherwise the PDF worker will crash
                   key={`${params.order}-${JSON.stringify(filterParams)}-primary`}
                 />
@@ -490,7 +536,7 @@ export function InboxDetails() {
                     <div key={relatedItem.id} className="min-h-0 flex-shrink-0">
                       <FileViewer
                         mimeType={relatedItem.contentType}
-                        url={`/api/proxy?filePath=vault/${relatedItem.filePath.join("/")}`}
+                        url={`${process.env.NEXT_PUBLIC_API_URL}/files/proxy?filePath=vault/${relatedItem.filePath.join("/")}`}
                         key={`${relatedItem.id}-${params.order}-${JSON.stringify(filterParams)}`}
                       />
                     </div>
